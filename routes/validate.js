@@ -21,6 +21,7 @@ router.get('/', async function (req, res, next) {
       logToDiscord(`${msg1} ${msg2}`);
       confirmed = true;
       res.send({ success: true })
+      return;
     }
     await sleep(1000);
   }
