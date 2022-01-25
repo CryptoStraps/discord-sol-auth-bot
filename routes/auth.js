@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 const { URLSearchParams } = require("url");
 const logToDiscord = require("./_discord");
 var express = require('express');
@@ -33,9 +32,6 @@ router.get('/', async function (req, res, next) {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   }).then((res) => res.json());
-
-  console.log(`${API_ENDPOINT}/users/@me`);
-  console.log(resp)
   const me = await fetch(`${API_ENDPOINT}/users/@me`, {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
@@ -43,8 +39,9 @@ router.get('/', async function (req, res, next) {
   if (me && me.username) {
     logToDiscord(`${me.username}#${me.discriminator}`);
     res.send(resp);
+    return;
   }
-  res.send('Not found')
+  res.send(`Error: `, resp)
 });
 
 module.exports = router;
