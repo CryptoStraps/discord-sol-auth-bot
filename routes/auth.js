@@ -42,6 +42,7 @@ router.get('/', async function (req, res, next) {
     logToDiscord(`${me.username}#${me.discriminator}`);
     res.send(resp);
   }
+  res.send('Not found')
 });
 
 module.exports = router;
