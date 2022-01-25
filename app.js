@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", 'https://cryptostraps.io');
+  res.header("Access-Control-Allow-Origin", 'https://api.cryptostraps.io');
   next();
 });
 
