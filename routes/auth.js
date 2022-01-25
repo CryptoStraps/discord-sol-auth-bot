@@ -34,6 +34,8 @@ router.get('/', async function (req, res, next) {
     },
   }).then((res) => res.json());
 
+  console.log(`${API_ENDPOINT}/users/@me`);
+  console.log(resp)
   const me = await fetch(`${API_ENDPOINT}/users/@me`, {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
