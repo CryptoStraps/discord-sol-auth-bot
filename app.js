@@ -15,6 +15,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", 'https://api.cryptostraps.io');
+  next();
+});
+
 app.use('/auth', authRouter);
 app.use('/validate', validateRouter);
 
