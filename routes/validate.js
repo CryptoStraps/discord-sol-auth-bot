@@ -11,6 +11,10 @@ const sleep = (time = 1000) =>
 /* GET home page. */
 router.get('/', async function(req, res, next) {
   const { txid } = req.query;
+  if (!txid) {
+    res.send({});
+    return
+  }
   let confirmed;
   while (!confirmed) {
     const tx = await connection.getConfirmedTransaction(txid);

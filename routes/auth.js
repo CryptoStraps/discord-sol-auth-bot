@@ -14,6 +14,10 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 /* GET home page. */
 router.get('/', async function (req, res, next) {
   const { code } = req.query;
+  if (!code) {
+    res.send({});
+    return;
+  }
   const data = {
     client_id: CLIENT_ID,
     client_secret: CLIENT_SECRET,
