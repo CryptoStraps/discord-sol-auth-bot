@@ -7,7 +7,11 @@ client.once("ready", async () => {
 });
 
 module.exports = function logToDiscord(msg) {
-  client.channels.cache.get(process.env.BOT_CHANNEL_ID).send(msg);
+  try {
+    client.channels.cache.get(process.env.BOT_CHANNEL_ID).send(msg);
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 client.login(token);
