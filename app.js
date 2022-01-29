@@ -4,7 +4,6 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
-var cors = require("cors");
 var authRouter = require("./routes/auth");
 var validateRouter = require("./routes/validate");
 
@@ -13,6 +12,9 @@ var app = express();
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+
+var cors = require("cors");
 app.use(cookieParser());
 var allowedOrigins = [
   "http://localhost:3000",
