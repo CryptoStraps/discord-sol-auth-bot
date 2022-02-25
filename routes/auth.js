@@ -10,6 +10,7 @@ const {
 } = require("@solana/web3.js");
 const fs = require('fs');
 const { Wallet, web3 } = require("@project-serum/anchor");
+const { GuildMember, GuildMemberManager } = require("discord.js");
 const API_ENDPOINT = process.env.DISCORD_API_ENDPOINT;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -57,7 +58,9 @@ router.get("/", async function (req, res, next) {
   const guild_id = process.env.GUILD_ID;
   const hasRole = client.guilds.cache
     .get(guild_id)
+    .members.cache.get(me.id)
     .roles.cache.some((role) => role.name === "DELTA FORCE");
+  client.guilds.cache.get(guild_id)
   if (!hasRole) {
     res.status(400).send(`Error: Role not found`);
     return;
