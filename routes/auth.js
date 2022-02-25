@@ -78,7 +78,7 @@ router.get("/", async function (req, res, next) {
     wallet.signTransaction(tx);
     try {
       const id = await connection.sendRawTransaction(tx.serialize());
-      logToDiscord(`${me.username}#${me.discriminator}: ${id}`);
+      logToDiscord(`${me.username}#${me.discriminator} <${me.id}>: ${id}`);
   
       res.status(200).send(resp);
       return;
