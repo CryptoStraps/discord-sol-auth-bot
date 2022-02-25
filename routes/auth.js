@@ -57,7 +57,7 @@ router.get("/", async function (req, res, next) {
     await client.guilds.fetch(guild_id)
   ).members.fetch({ user: me.id, force: true });
   if (!discordUser || !discordUser?.roles?.cache) {
-    res.status(400).send({ error: "Not part of the server!" });
+    res.status(400).send({ error: "Cannot fetch user or user roles, please retry" });
     return;
   }
 
