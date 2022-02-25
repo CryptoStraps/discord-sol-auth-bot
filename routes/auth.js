@@ -55,14 +55,22 @@ router.get("/", async function (req, res, next) {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
   const guild_id = process.env.GUILD_ID;
-  const discordUser =  await client.guilds.cache.get(guild_id).members.fetch(me.id);
-  console.log({guild_id, discordUser, id: me.id})
+  const discordUser = await (
+    await client.guilds.fetch(guild_id)
+  ).members.fetch(me.id);
+  console.log(
+    `HAS? ${discordUser.roles.cache.some(
+      (role) => role.name === "DELTA FORCE"
+    )}`
+  );
   if (!discordUser) {
     res.status(400).send({ error: "Not part of the server!" });
     return;
   }
 
-  const hasRole = discordUser.roles.cache.some((role) => role.name === "DELTA FORCE");
+  const hasRole = discordUser.roles.cache.some(
+    (role) => role.name === "DELTA FORCE"
+  );
   if (!hasRole) {
     res.status(400).send({ error: "`Error: Role not found`" });
     return;
