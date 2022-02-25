@@ -1,4 +1,4 @@
-const logToDiscord = require("./_discord");
+const {logToDiscord} = require("./_discord");
 var express = require('express');
 var router = express.Router();
 const { Connection } = require("@solana/web3.js");
@@ -22,11 +22,11 @@ ${msg2}`;
 router.get('/', async function (req, res, next) {
   const { txid } = req.query;
   if (!txid) {
-    res.send({ error: 'no txid specified' });
+    res.status(400).send({ error: 'no txid specified' });
     return
   }
   const msg = await getTxRecursively(txid);
   logToDiscord(msg);
-  res.send({ success: true });
+  res.status(200).send({ success: true });
 });
 module.exports = router;

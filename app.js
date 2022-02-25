@@ -4,6 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
+var submitRouter = require("./routes/submit");
 var authRouter = require("./routes/auth");
 var validateRouter = require("./routes/validate");
 
@@ -18,6 +19,7 @@ var cors = require("cors");
 app.use(cookieParser());
 var allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:3001",
   "https://wl.cryptostraps.io",
   "https://cryptostraps.io",
 ];
@@ -40,6 +42,7 @@ app.use(
 );
 app.use("/auth", authRouter);
 app.use("/validate", validateRouter);
+app.use("/submit", submitRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -54,7 +57,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.send("error");
+  res.status(500).send("error");
 });
 
 module.exports = app;

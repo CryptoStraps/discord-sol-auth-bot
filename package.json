@@ -6,19 +6,22 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@solana/web3.js": "^1.32.0",
+    "@project-serum/anchor": "^0.22.0",
+    "@solana/web3.js": "^1.35.1",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "discord.js": "^13.6.0",
     "dotenv": "^14.3.0",
     "express": "~4.16.1",
+    "form-data": "^4.0.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-    "node-fetch": "^3.2.0"
+    "node-fetch": "^3.2.0",
+    "tweetnacl": "^1.0.3"
   },
   "engines": {
-    "node": "v16.13.2"
+    "node": "v16.14.0"
   }
 }

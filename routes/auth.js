@@ -1,20 +1,33 @@
-const { URLSearchParams } = require("url");
-const logToDiscord = require("./_discord");
-var express = require('express');
+const { logToDiscord, client } = require("./_discord");
+var express = require("express");
 var router = express.Router();
-const fetch = require('../util/fetch');
-
+const fetch = require("../util/fetch");
+const {
+  Keypair,
+  Transaction,
+  TransactionInstruction,
+  PublicKey
+} = require("@solana/web3.js");
+const fs = require('fs');
+const { Wallet, web3 } = require("@project-serum/anchor");
 const API_ENDPOINT = process.env.DISCORD_API_ENDPOINT;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
+const connection = new web3.Connection("https://alice.genesysgo.net");
+const walletKeypair = Keypair.fromSecretKey(
+  new Uint8Array(JSON.parse(fs.readFileSync('/Users/michaelgerullis/git/cli/guntXfLJzkewRM7eyvLSBQhRhiNGoGYZxybkDubF7uK.json').toString()))
+);
+const wallet = new Wallet(walletKeypair);
+
+const map = new Map();
 
 /* GET home page. */
-router.get('/', async function (req, res, next) {
+router.get("/", async function (req, res, next) {
   const { code } = req.query;
   if (!code) {
-    res.send({});
+    res.status(200).send({});
     return;
   }
   const data = {
@@ -23,11 +36,17 @@ router.get('/', async function (req, res, next) {
     grant_type: "authorization_code",
     code: code,
     redirect_uri: REDIRECT_URI,
+    scope: "identify",
   };
-  const params = new URLSearchParams(data);
+  const params = new URLSearchParams();
+  Object.entries(data).forEach(([key, value]) => {
+    console.log(key, value);
+    params.append(key, value);
+  });
+  console.log(params.toString());
   const resp = await fetch(`${API_ENDPOINT}/oauth2/token`, {
     method: "POST",
-    body: params,
+    body: new URLSearchParams(data),
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
@@ -35,14 +54,41 @@ router.get('/', async function (req, res, next) {
   const me = await fetch(`${API_ENDPOINT}/users/@me`, {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
-
-  if (me && me.username) {
-    logToDiscord(`${me.username}#${me.discriminator}`);
-    res.send(resp);
+  const guild_id = "851195659533156402";
+  const hasRole = client.guilds.cache
+    .get(guild_id)
+    .roles.cache.some((role) => role.name === "DELTA FORCE");
+  if (!hasRole) {
+    res.status(400).send(`Error: Role not found`);
     return;
   }
-  res.send(`Error: `, resp)
+
+  if (me && me.username) {
+    const tx = new Transaction();
+    const {blockhash} = await connection.getRecentBlockhash();
+    tx.recentBlockhash = blockhash;
+    tx.feePayer = wallet.publicKey;
+    tx.add(
+      new TransactionInstruction({
+        keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
+        data: Buffer.from(`${me.username}#${me.discriminator} (${me.id})`, "utf-8"),
+        programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+      })
+    );
+    wallet.signTransaction(tx);
+    try {
+      const id = await connection.sendRawTransaction(tx.serialize());
+      logToDiscord(`${me.username}#${me.discriminator}: ${id}`);
+  
+      res.status(200).send(resp);
+      return;
+
+    } catch (e) {
+      res.status(500).send(e);
+      return;
+    }
+  }
+
 });
 
 module.exports = router;
-
