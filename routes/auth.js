@@ -6,9 +6,8 @@ const {
   Keypair,
   Transaction,
   TransactionInstruction,
-  PublicKey
+  PublicKey,
 } = require("@solana/web3.js");
-const fs = require('fs');
 const { Wallet, web3 } = require("@project-serum/anchor");
 const { GuildMember, GuildMemberManager } = require("discord.js");
 const API_ENDPOINT = process.env.DISCORD_API_ENDPOINT;
@@ -56,12 +55,12 @@ router.get("/", async function (req, res, next) {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
   const guild_id = process.env.GUILD_ID;
-  const hasRole = client.guilds.cache
-    .get(guild_id)
-    .members.cache.get(me.id)
-    .roles.cache.some((role) => role.name === "DELTA FORCE");
+  const me = client.guilds.cache.get(guild_id).members.cache.get(me.id);
+  res.status(400).send({ error: "Not part of the server!" });
+
+  const hasRole = me.roles.cache.some((role) => role.name === "DELTA FORCE");
   if (!hasRole) {
-    res.status(400).send(`Error: Role not found`);
+    res.status(400).send({ error: "`Error: Role not found`" });
     return;
   }
 
@@ -104,16 +103,14 @@ New Submission!
 User: ${me.username}#${me.discriminator}
 User-ID: <${me.id}>: 
 Transaction: https://solscan.io/tx/${id}`);
-  
+
       res.status(200).send(resp);
       return;
-
     } catch (e) {
       res.status(500).send(e);
       return;
     }
   }
-
 });
 
 module.exports = router;
