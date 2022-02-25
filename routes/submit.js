@@ -14,7 +14,7 @@ router.get('/', async function (req, res, next) {
     Uint8Array.from(signature.split(',')),
     new PublicKey(pubkey).toBytes()
   );
-  if (verified) {
+  if (verified && discordHandle && pubkey) {
     logToDiscord(`
 Submission completed!
 User: ${discordHandle}
@@ -23,6 +23,9 @@ Pubkey: ${pubkey}
 Signed Message: [${signature}]
 `);
     res.status(200).send({ success: true });
+  } else {
+    res.status(400).send({ error: 'Missing data, please restart' });
+
   }
 });
 module.exports = router;
