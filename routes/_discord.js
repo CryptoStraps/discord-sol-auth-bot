@@ -3,7 +3,7 @@ const { Client, Intents } = require("discord.js");
 
 const token = process.env.SERVER_TOKEN;
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
 });
 client.once("ready", async (_client) => {
   console.log("Ready!");
