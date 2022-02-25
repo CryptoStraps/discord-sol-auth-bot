@@ -18,8 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 var cors = require("cors");
 app.use(cookieParser());
 var allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3001",
+  // "http://localhost:3000",
+  // "http://localhost:3001",
   "https://whitelist.cryptostraps.io",
 ];
 
