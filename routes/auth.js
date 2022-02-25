@@ -67,7 +67,7 @@ router.get("/", async function (req, res, next) {
     const tx = new Transaction();
     let blockhash;
     const setBlockhash = async () => {
-      blockhash = await connection.getRecentBlockhash();
+      blockhash = await (await connection.getRecentBlockhash()).blockhash;
     };
 
     while (!blockhash) {
