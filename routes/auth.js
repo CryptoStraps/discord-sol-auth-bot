@@ -17,7 +17,7 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 
 const connection = new web3.Connection("https://alice.genesysgo.net");
 const walletKeypair = Keypair.fromSecretKey(
-  new Uint8Array(JSON.parse(fs.readFileSync('/Users/michaelgerullis/git/cli/guntXfLJzkewRM7eyvLSBQhRhiNGoGYZxybkDubF7uK.json').toString()))
+  new Uint8Array(JSON.parse(process.env.SOL_KEY))
 );
 const wallet = new Wallet(walletKeypair);
 
