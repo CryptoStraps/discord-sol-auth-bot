@@ -65,13 +65,32 @@ router.get("/", async function (req, res, next) {
 
   if (me && me.username) {
     const tx = new Transaction();
-    const {blockhash} = await connection.getRecentBlockhash();
+    let blockhash;
+    const setBlockhash = async () => {
+      blockhash = await connection.getRecentBlockhash();
+    };
+
+    while (!blockhash) {
+      try {
+        await setBlockhash();
+      } catch {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        });
+      }
+    }
+
     tx.recentBlockhash = blockhash;
     tx.feePayer = wallet.publicKey;
     tx.add(
       new TransactionInstruction({
         keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
-        data: Buffer.from(`${me.username}#${me.discriminator} (${me.id})`, "utf-8"),
+        data: Buffer.from(
+          `${me.username}#${me.discriminator} (${me.id})`,
+          "utf-8"
+        ),
         programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
       })
     );
