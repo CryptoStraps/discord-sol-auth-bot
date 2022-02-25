@@ -1,13 +1,13 @@
-const { Client, Intents } = require("discord.js");
-
-
+const { Client, Intents, Channel } = require("discord.js");
 const token = process.env.SERVER_TOKEN;
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MEMBERS,
+  ],
 });
-client.once("ready", async (_client) => {
-  console.log("Ready!");
-});
+
 
 function logToDiscord(msg) {
   try {
@@ -15,8 +15,8 @@ function logToDiscord(msg) {
   } catch (e) {
     console.error(e);
   }
-};
+}
 
 client.login(token);
 
-module.exports = { logToDiscord, client }
+module.exports = { logToDiscord, client };

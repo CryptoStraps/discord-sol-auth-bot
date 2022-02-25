@@ -17,6 +17,7 @@
     "form-data": "^4.0.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "json-format": "^1.0.1",
     "morgan": "~1.9.1",
     "node-fetch": "^3.2.0",
     "tweetnacl": "^1.0.3"
