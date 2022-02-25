@@ -7,6 +7,7 @@ require("dotenv").config();
 var submitRouter = require("./routes/submit");
 var authRouter = require("./routes/auth");
 var validateRouter = require("./routes/validate");
+var statusRouter = require("./routes/get-list");
 
 var app = express();
 
@@ -45,6 +46,7 @@ app.use(
 app.use("/auth", authRouter);
 app.use("/validate", validateRouter);
 app.use("/submit", submitRouter);
+app.use("/status", statusRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
