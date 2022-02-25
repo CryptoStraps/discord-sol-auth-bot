@@ -55,7 +55,8 @@ router.get("/", async function (req, res, next) {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
   const guild_id = process.env.GUILD_ID;
-  const discordUser = client.guilds.cache.get(guild_id).members.cache.get(me.id);
+  const discordUser =  await client.guilds.cache.get(guild_id).members.fetch(me.id);
+  console.log({guild_id, discordUser, id: me.id})
   if (!discordUser) {
     res.status(400).send({ error: "Not part of the server!" });
     return;
