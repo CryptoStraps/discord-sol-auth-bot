@@ -54,7 +54,7 @@ router.get("/", async function (req, res, next) {
   const me = await fetch(`${API_ENDPOINT}/users/@me`, {
     headers: { Authorization: `Bearer ${resp.access_token}` },
   }).then((res) => res.json());
-  const guild_id = "851195659533156402";
+  const guild_id = process.env.GUILD_ID;
   const hasRole = client.guilds.cache
     .get(guild_id)
     .roles.cache.some((role) => role.name === "DELTA FORCE");
