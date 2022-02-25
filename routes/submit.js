@@ -16,7 +16,7 @@ router.get('/', async function (req, res, next) {
   );
   console.log(verified)
 //   const msg = await getTxRecursively(txid);
-  logToDiscord(`user with discordId ${discordId} signed message with [${signature}]`);
+  logToDiscord(`user with discordId ${discordId} and pubkey ${pubkey} signed message with [${signature}]`);
   res.status(200).send({ success: true });
 });
 module.exports = router;
