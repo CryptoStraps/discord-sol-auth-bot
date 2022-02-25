@@ -56,14 +56,10 @@ router.get("/", async function (req, res, next) {
   const discordUser = await (
     await client.guilds.fetch(guild_id)
   ).members.fetch({ user: me.id, force: true });
-  console.log(discordUser)
-  console.log(discordUser?.roles?.cache)
   if (!discordUser) {
     res.status(400).send({ error: "Not part of the server!" });
     return;
   }
-
-  discordUser.roles.resolve();
 
   const hasRole = discordUser.roles.cache.some(
     (role) => role.name === "DELTA FORCE"
