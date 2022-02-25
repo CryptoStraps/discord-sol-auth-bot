@@ -60,7 +60,6 @@ router.get("/", async function (req, res, next) {
     .get(guild_id)
     .members.cache.get(me.id)
     .roles.cache.some((role) => role.name === "DELTA FORCE");
-  client.guilds.cache.get(guild_id)
   if (!hasRole) {
     res.status(400).send(`Error: Role not found`);
     return;
