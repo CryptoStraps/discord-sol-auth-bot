@@ -20,8 +20,7 @@ app.use(cookieParser());
 var allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
-  "https://wl.cryptostraps.io",
-  "https://cryptostraps.io",
+  "https://whitelist.cryptostraps.io",
 ];
 
 app.use(
