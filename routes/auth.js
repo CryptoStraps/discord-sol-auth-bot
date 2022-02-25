@@ -25,96 +25,101 @@ const map = new Map();
 
 /* GET home page. */
 router.get("/", async function (req, res, next) {
-  const { code } = req.query;
-  if (!code) {
-    res.status(200).send({});
-    return;
-  }
-  const data = {
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
-    grant_type: "authorization_code",
-    code: code,
-    redirect_uri: REDIRECT_URI,
-    scope: "identify",
-  };
-  const params = new URLSearchParams();
-  Object.entries(data).forEach(([key, value]) => {
-    params.append(key, value);
-  });
-  const resp = await fetch(`${API_ENDPOINT}/oauth2/token`, {
-    method: "POST",
-    body: new URLSearchParams(data),
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then((res) => res.json());
-  const me = await fetch(`${API_ENDPOINT}/users/@me`, {
-    headers: { Authorization: `Bearer ${resp.access_token}` },
-  }).then((res) => res.json());
-  const guild_id = process.env.GUILD_ID;
-  const discordUser = await (
-    await client.guilds.fetch(guild_id)
-  ).members.fetch({ user: me.id, force: true });
-  if (!discordUser || !discordUser?.roles?.cache) {
-    res.status(400).send({ error: "Cannot fetch user or user roles, please retry" });
-    return;
-  }
+  try {
 
-  const hasRole = discordUser.roles.cache.some(
-    (role) => role.name === "DELTA FORCE"
-  );
-  if (!hasRole) {
-    res.status(400).send({ error: "`Error: Role not found`" });
-    return;
-  }
-
-  if (me && me.username) {
-    const tx = new Transaction();
-    let blockhash;
-    const setBlockhash = async () => {
-      blockhash = await (await connection.getRecentBlockhash()).blockhash;
+    const { code } = req.query;
+    if (!code) {
+      res.status(200).send({});
+      return;
+    }
+    const data = {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: REDIRECT_URI,
+      scope: "identify",
     };
-
-    while (!blockhash) {
+    const params = new URLSearchParams();
+    Object.entries(data).forEach(([key, value]) => {
+      params.append(key, value);
+    });
+    const resp = await fetch(`${API_ENDPOINT}/oauth2/token`, {
+      method: "POST",
+      body: new URLSearchParams(data),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }).then((res) => res.json());
+    const me = await fetch(`${API_ENDPOINT}/users/@me`, {
+      headers: { Authorization: `Bearer ${resp.access_token}` },
+    }).then((res) => res.json());
+    const guild_id = process.env.GUILD_ID;
+    const discordUser = await (
+      await client.guilds.fetch(guild_id)
+    ).members.fetch({ user: me.id, force: true });
+    if (!discordUser || !discordUser?.roles?.cache) {
+      res.status(400).send({ error: "Cannot fetch user or user roles, please retry" });
+      return;
+    }
+  
+    const hasRole = discordUser.roles.cache.some(
+      (role) => role.name === "DELTA FORCE"
+    );
+    if (!hasRole) {
+      res.status(400).send({ error: "`Error: Role not found`" });
+      return;
+    }
+  
+    if (me && me.username) {
+      const tx = new Transaction();
+      let blockhash;
+      const setBlockhash = async () => {
+        blockhash = await (await connection.getRecentBlockhash()).blockhash;
+      };
+  
+      while (!blockhash) {
+        try {
+          await setBlockhash();
+        } catch {
+          await new Promise((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 1000);
+          });
+        }
+      }
+  
+      tx.recentBlockhash = blockhash;
+      tx.feePayer = wallet.publicKey;
+      tx.add(
+        new TransactionInstruction({
+          keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
+          data: Buffer.from(
+            `${me.username}#${me.discriminator} (${me.id})`,
+            "utf-8"
+          ),
+          programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+        })
+      );
+      wallet.signTransaction(tx);
       try {
-        await setBlockhash();
-      } catch {
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, 1000);
-        });
+        const id = await connection.sendRawTransaction(tx.serialize());
+        logToDiscord(`
+  New Submission!
+  User: ${me.username}#${me.discriminator}
+  User-ID: <${me.id}>: 
+  Transaction: https://solscan.io/tx/${id}`);
+  
+        res.status(200).send(resp);
+        return;
+      } catch (e) {
+        res.status(500).send(e);
+        return;
       }
     }
-
-    tx.recentBlockhash = blockhash;
-    tx.feePayer = wallet.publicKey;
-    tx.add(
-      new TransactionInstruction({
-        keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
-        data: Buffer.from(
-          `${me.username}#${me.discriminator} (${me.id})`,
-          "utf-8"
-        ),
-        programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
-      })
-    );
-    wallet.signTransaction(tx);
-    try {
-      const id = await connection.sendRawTransaction(tx.serialize());
-      logToDiscord(`
-New Submission!
-User: ${me.username}#${me.discriminator}
-User-ID: <${me.id}>: 
-Transaction: https://solscan.io/tx/${id}`);
-
-      res.status(200).send(resp);
-      return;
-    } catch (e) {
-      res.status(500).send(e);
-      return;
-    }
+  } catch (e) {
+    res.status(400).send({error: 'errrrror'})
   }
 });
 
