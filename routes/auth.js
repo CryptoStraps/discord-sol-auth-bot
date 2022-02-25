@@ -56,7 +56,10 @@ router.get("/", async function (req, res, next) {
   }).then((res) => res.json());
   const guild_id = process.env.GUILD_ID;
   const discordUser = client.guilds.cache.get(guild_id).members.cache.get(me.id);
-  res.status(400).send({ error: "Not part of the server!" });
+  if (!discordUser) {
+    res.status(400).send({ error: "Not part of the server!" });
+    return;
+  }
 
   const hasRole = discordUser.roles.cache.some((role) => role.name === "DELTA FORCE");
   if (!hasRole) {
