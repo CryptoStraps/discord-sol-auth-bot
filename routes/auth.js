@@ -55,7 +55,7 @@ router.get("/", async function (req, res, next) {
   const guild_id = process.env.GUILD_ID;
   const discordUser = await (
     await client.guilds.fetch(guild_id)
-  ).members.fetch(me.id);
+  ).members.fetch({ user: me.id, force: true });
   if (!discordUser) {
     res.status(400).send({ error: "Not part of the server!" });
     return;
