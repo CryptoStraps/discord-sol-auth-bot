@@ -44,7 +44,7 @@ async function lots_of_messages_getter(channel, limit = 20000) {
         } catch {}
       });
       last_id = messages.last().id;
-      cache = Array.from(usermap).filter((m) => !!m);
+      cache = Array.from(usermap).reverse().filter((m) => !!m);
 
       console.log(`Current size: ${sum_messages.length}`);
 
