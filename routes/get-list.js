@@ -18,8 +18,8 @@ const usermap = new Map();
 const sum_messages = [];
 let cache;
 let last_id;
-let total = 0;
 async function lots_of_messages_getter(channel, limit = 1000000) {
+  let total = 0;
   let end;
   console.log(`Starting fetch at ${new Date()}`);
   while (!end) {
