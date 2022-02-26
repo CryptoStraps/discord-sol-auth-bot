@@ -21,6 +21,7 @@ let last_id;
 let total = 0;
 async function lots_of_messages_getter(channel, limit = 1000000) {
   let end;
+  console.log(`Starting fetch at ${new Date()}`);
   while (!end) {
     try {
       const options = { limit: 100 };
@@ -47,16 +48,15 @@ async function lots_of_messages_getter(channel, limit = 1000000) {
         } catch {}
       });
       last_id = messages.last().id;
-      cache = Array.from(usermap)
-        .reverse()
-        .filter((m) => !!m);
+      cache = Array.from(usermap).filter((m) => !!m);
 
       console.log(`Current size: ${sum_messages.length}`);
 
       console.log({ msize: messages.size });
       if (messages.size != 100 || sum_messages.length >= limit) {
         end = true;
-        console.log("end");
+        console.log(`end fetch at ${new Date()}`);
+
         console.log(Object.keys(cache).length);
       }
     } catch {}
