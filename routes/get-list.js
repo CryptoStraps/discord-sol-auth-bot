@@ -64,7 +64,7 @@ client.once("ready", async (_client) => {
   const channel = _client.channels.cache.get("946729044857200640");
 
   await lots_of_messages_getter(channel);
-  setTimeout(async () => {
+  setInterval(async () => {
     await lots_of_messages_getter(channel);
   }, 60000);
 });
