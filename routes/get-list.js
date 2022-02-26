@@ -56,8 +56,7 @@ async function lots_of_messages_getter(channel, limit = 1000000) {
       if (messages.size != 100 || sum_messages.length >= limit) {
         end = true;
         console.log(`end fetch at ${new Date()}`);
-
-        console.log(Object.keys(cache).length);
+        console.log(`users: ${usermap.size}`)
       }
     } catch {}
   }
@@ -79,9 +78,11 @@ router.get("/all", async function (req, res, next) {
   res.status(200).send(cache);
 });
 router.get("/one", async function (req, res, next) {
-  const { pubkey } = req.query;
-  const found = cache.some((c) => c[1] === pubkey);
-  res.status(200).send({ found });
+  try {
+    const { pubkey } = req.query;
+    const found = cache.some((c) => c[1] === pubkey);
+    res.status(200).send({ found });
+  } catch {}
 });
 
 client.login(token);
