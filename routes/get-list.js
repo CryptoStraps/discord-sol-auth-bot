@@ -82,7 +82,9 @@ router.get("/one", async function (req, res, next) {
     const { pubkey } = req.query;
     const found = cache.some((c) => c[1] === pubkey);
     res.status(200).send({ found });
-  } catch {}
+  } catch {
+    res.status(400).send({error: 'Error fetching, please retry'})
+  }
 });
 
 client.login(token);

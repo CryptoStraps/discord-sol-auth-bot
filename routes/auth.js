@@ -26,7 +26,6 @@ const map = new Map();
 /* GET home page. */
 router.get("/", async function (req, res, next) {
   try {
-
     const { code } = req.query;
     if (!code) {
       res.status(200).send({});
@@ -59,10 +58,12 @@ router.get("/", async function (req, res, next) {
       await client.guilds.fetch(guild_id)
     ).members.fetch({ user: me.id, force: true });
     if (!discordUser || !discordUser?.roles?.cache) {
-      res.status(400).send({ error: "Cannot fetch user or user roles, please retry" });
+      res
+        .status(400)
+        .send({ error: "Cannot fetch user or user roles, please retry" });
       return;
     }
-  
+
     const hasRole = discordUser.roles.cache.some(
       (role) => role.name === "DELTA FORCE"
     );
@@ -70,17 +71,13 @@ router.get("/", async function (req, res, next) {
       res.status(400).send({ error: "`Error: Role not found`" });
       return;
     }
-  
+
     if (me && me.username) {
       const tx = new Transaction();
       let blockhash;
       const setBlockhash = async () => {
-        blockhash = await (await connection.getRecentBlockhash()).blockhash;
-      };
-  
-      while (!blockhash) {
         try {
-          await setBlockhash();
+          blockhash = await (await connection.getRecentBlockhash()).blockhash;
         } catch {
           await new Promise((resolve) => {
             setTimeout(() => {
@@ -88,18 +85,26 @@ router.get("/", async function (req, res, next) {
             }, 1000);
           });
         }
+      };
+
+      while (!blockhash) {
+        await setBlockhash();
       }
-  
+
       tx.recentBlockhash = blockhash;
       tx.feePayer = wallet.publicKey;
       tx.add(
         new TransactionInstruction({
-          keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
+          keys: [
+            { pubkey: wallet.publicKey, isSigner: true, isWritable: true },
+          ],
           data: Buffer.from(
             `${me.username}#${me.discriminator} (${me.id})`,
             "utf-8"
           ),
-          programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+          programId: new PublicKey(
+            "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
+          ),
         })
       );
       wallet.signTransaction(tx);
@@ -110,7 +115,7 @@ router.get("/", async function (req, res, next) {
   User: ${me.username}#${me.discriminator}
   User-ID: <${me.id}>: 
   Transaction: https://solscan.io/tx/${id}`);
-  
+
         res.status(200).send(resp);
         return;
       } catch (e) {
@@ -119,7 +124,7 @@ router.get("/", async function (req, res, next) {
       }
     }
   } catch (e) {
-    res.status(400).send({error: 'errrrror'})
+    res.status(400).send({ error: "errrrror" });
   }
 });
 
