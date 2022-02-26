@@ -41,7 +41,7 @@ async function lots_of_messages_getter(channel, limit = 1000000) {
             .split("Pubkey: ")[1]
             .split("\n")[0];
 
-          if (!usermap.has(discordId) && pubkey) {
+          if (pubkey) {
             usermap.set(discordId, pubkey);
             sum_messages.push({ discordId, pubkey });
           }
