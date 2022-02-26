@@ -18,7 +18,8 @@ const usermap = new Map();
 const sum_messages = [];
 let cache;
 let last_id;
-async function lots_of_messages_getter(channel, limit = 20000) {
+let total = 0;
+async function lots_of_messages_getter(channel, limit = 1000000) {
   let end;
   while (!end) {
     try {
@@ -28,6 +29,8 @@ async function lots_of_messages_getter(channel, limit = 20000) {
       }
 
       const messages = await channel.messages.fetch(options);
+      total += 100;
+      console.log({ total });
       messages.forEach((message) => {
         try {
           const discordId = ((message || {}).content || "")
@@ -44,7 +47,9 @@ async function lots_of_messages_getter(channel, limit = 20000) {
         } catch {}
       });
       last_id = messages.last().id;
-      cache = Array.from(usermap).reverse().filter((m) => !!m);
+      cache = Array.from(usermap)
+        .reverse()
+        .filter((m) => !!m);
 
       console.log(`Current size: ${sum_messages.length}`);
 
@@ -66,7 +71,7 @@ client.once("ready", async (_client) => {
   await lots_of_messages_getter(channel);
   setInterval(async () => {
     await lots_of_messages_getter(channel);
-  }, 60000);
+  }, 300000);
 });
 var express = require("express");
 var router = express.Router();
