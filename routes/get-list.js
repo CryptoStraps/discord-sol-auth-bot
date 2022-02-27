@@ -70,7 +70,7 @@ client.once("ready", async (_client) => {
   await lots_of_messages_getter(channel);
   setInterval(async () => {
     await lots_of_messages_getter(channel);
-  }, 300000);
+  }, 600000);
 });
 var express = require("express");
 var router = express.Router();
