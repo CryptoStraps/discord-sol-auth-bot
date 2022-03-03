@@ -14,7 +14,8 @@ const client = new Client({
  * @param {number} limit
  * @returns
  */
-module.exports.usermap = new Map();
+const usermap = usermap = new Map();
+module.exports.usermap = usermap;
 const sum_messages = [];
 let cache;
 let last_id;
