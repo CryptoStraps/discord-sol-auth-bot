@@ -64,7 +64,7 @@ app.use(function (err, req, res, next) {
   res.status(500).send("error");
 });
 process.on('uncaughtException', function(err) {
-  
+  createError(500)
   // Handle the error safely
   console.log(err)
 })
