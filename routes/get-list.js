@@ -1,4 +1,6 @@
 const { Client, Intents, Channel } = require("discord.js");
+var express = require("express");
+
 const token = process.env.SERVER_TOKEN;
 const client = new Client({
   intents: [
@@ -15,10 +17,10 @@ const client = new Client({
  * @returns
  */
 const usermap = new Map();
-module.exports.usermap = usermap;
 const sum_messages = [];
 let cache;
 let last_id;
+  
 async function lots_of_messages_getter(channel, limit = 1000000) {
   let total = 0;
   let end;
@@ -64,6 +66,7 @@ async function lots_of_messages_getter(channel, limit = 1000000) {
 
   return sum_messages;
 }
+
 client.once("ready", async (_client) => {
   console.log("Ready!");
   const channel = _client.channels.cache.get("946729044857200640");
@@ -73,11 +76,12 @@ client.once("ready", async (_client) => {
     process.exit(1);
   }, 150000);
 });
-var express = require("express");
+
 var router = express.Router();
 router.get("/all", async function (req, res, next) {
   res.status(200).send(cache);
 });
+
 router.get("/one", async function (req, res, next) {
   try {
     const { pubkey } = req.query;
@@ -91,3 +95,4 @@ router.get("/one", async function (req, res, next) {
 client.login(token);
 
 module.exports = router;
+module.exports.usermap = usermap;
