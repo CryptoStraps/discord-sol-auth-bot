@@ -74,7 +74,10 @@ router.get("/", async function (req, res, next) {
     if (me && me.username) {
       const tx = new Transaction();
       let blockhash;
+      let tries = 0;
       const setBlockhash = async () => {
+        tries++;
+        console.log(`setting blockhash try ${tries}`);
         try {
           blockhash = await (await connection.getRecentBlockhash()).blockhash;
         } catch {
@@ -95,7 +98,11 @@ router.get("/", async function (req, res, next) {
       tx.add(
         new TransactionInstruction({
           keys: [
-            { pubkey: wallet.publicKey, isSigner: true, isWritable: true },
+            {
+              pubkey: wallet.publicKey,
+              isSigner: true,
+              isWritable: true,
+            },
           ],
           data: Buffer.from(
             `${me.username}#${me.discriminator} (${me.id})`,
@@ -123,7 +130,7 @@ router.get("/", async function (req, res, next) {
       }
     }
   } catch (e) {
-    console.log(e)
+    console.log(e);
     res.status(400).send({ error: "errrrror" });
   }
 });
