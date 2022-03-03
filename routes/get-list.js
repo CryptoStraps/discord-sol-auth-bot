@@ -71,7 +71,7 @@ client.once("ready", async (_client) => {
   await lots_of_messages_getter(channel);
   setInterval(async () => {
     process.exit(1);
-  }, 600000);
+  }, 150000);
 });
 var express = require("express");
 var router = express.Router();
