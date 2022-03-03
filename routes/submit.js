@@ -2,6 +2,7 @@ const {logToDiscord} = require("./_discord");
 var express = require('express');
 const nacl = require('tweetnacl');
 const { PublicKey } = require("@solana/web3.js");
+const { usermap } = require("./get-list");
 var router = express.Router();
 
 
@@ -15,6 +16,7 @@ router.get('/', async function (req, res, next) {
     new PublicKey(pubkey).toBytes()
   );
   if (verified && discordHandle && pubkey) {
+    usermap.set(discordId, pubkey);
     logToDiscord(`
 Submission completed!
 User: ${discordHandle}
