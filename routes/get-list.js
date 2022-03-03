@@ -20,7 +20,7 @@ const usermap = new Map();
 const sum_messages = [];
 let cache;
 let last_id;
-  
+
 async function lots_of_messages_getter(channel, limit = 1000000) {
   let total = 0;
   let end;
@@ -73,7 +73,7 @@ client.once("ready", async (_client) => {
 
   await lots_of_messages_getter(channel);
   setInterval(async () => {
-    process.exit(1);
+    await lots_of_messages_getter(channel);
   }, 150000);
 });
 
