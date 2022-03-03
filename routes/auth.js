@@ -9,7 +9,6 @@ const {
   PublicKey,
 } = require("@solana/web3.js");
 const { Wallet, web3 } = require("@project-serum/anchor");
-const { GuildMember, GuildMemberManager } = require("discord.js");
 const API_ENDPOINT = process.env.DISCORD_API_ENDPOINT;
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -124,6 +123,7 @@ router.get("/", async function (req, res, next) {
       }
     }
   } catch (e) {
+    console.log(e)
     res.status(400).send({ error: "errrrror" });
   }
 });
