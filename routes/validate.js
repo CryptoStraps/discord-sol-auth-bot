@@ -65,7 +65,6 @@ const cache = {};
           if (!cache[address]) {
             cache[address] = [];
           }
-          console.log( t.memo)
           cache[address].push(mint);
           cache[address] = [...new Set(cache[address])];
         }
@@ -87,7 +86,12 @@ var router = express.Router();
 router.get('/', async function (req, res, next) {
   const { address } = req.query;
   const mints = cache[address];
+  if (mints) {
+    res.status(200).send(mints);
+  } else {
+    res.status(200).send([]);
 
-  res.status(200).send(mints);
+  }
+
 });
 module.exports = router;
