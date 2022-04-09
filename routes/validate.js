@@ -1,32 +1,90 @@
-const {logToDiscord} = require("./_discord");
-var express = require('express');
-var router = express.Router();
-const { Connection } = require("@solana/web3.js");
-const connection = new Connection("https://alice.genesysgo.net");
-const sleep = (time = 1000) =>
-  new Promise((resolve, reject) => setTimeout(() => resolve(undefined), time));
 
-async function getTxRecursively(txid) {
-  const tx = await connection.getConfirmedTransaction(txid);
-  if (tx) {
-    const msg1 = tx.meta.logMessages.find((m) => m.includes("log: Signed by"));
-    const msg2 = tx.meta.logMessages.find((m) => m.includes("log: Memo"));
-    return `${msg1}
-${msg2}`;
+var express = require('express');
+const {Connection, PublicKey} = require('@solana/web3.js');
+const { sleep } = require('../util/sleep');
+const { Base64 } = require( "js-base64");
+const request = require( "request-promise");
+const { tokenAuthFetchMiddleware } = require("@strata-foundation/web3-token-auth");
+require("dotenv").config();
+
+const getToken = async () => {
+  const token = Base64.encode(
+    `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
+  );
+  try {
+    const { token_type, access_token } = await request({
+      uri: `${process.env.ISSUER}/token`,
+      json: true,
+      method: "POST",
+      headers: {
+        authorization: `Basic ${token}`,
+      },
+      form: {
+        grant_type: "client_credentials",
+      },
+    });
+    console.log({ token_type, access_token });
+    return access_token;
+  } catch (e) {
+    console.log(e);
   }
 
-  await sleep(1000);
-  return await getTxRecursively(txid);
 }
 
-router.get('/', async function (req, res, next) {
-  const { txid } = req.query;
-  if (!txid) {
-    res.status(400).send({ error: 'no txid specified' });
-    return
+const connection = new Connection('https://alice.genesysgo.net', {
+  fetchMiddleware: tokenAuthFetchMiddleware({ getToken }),
+  confirmTransactionInitialTimeout: 180000,
+});
+let before;
+const txs = new Map();
+const cache = {};
+
+(async () => {
+  while (true) {   
+    try {
+
+    const tx = await connection.getSignaturesForAddress(
+      new PublicKey('7oZm7RjNc7hr6ZYhe7rGQqsVbA1kD1C5sLR59bFUKX3G'),
+      { limit: 1000, before }
+    );
+    for (const t of tx) {
+      if (!t) {
+        return;
+      }
+
+      if (t.memo) {
+        const resolved = await connection.getTransaction(t.signature);
+        const signerPreBalance = resolved.meta.preTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
+        const signerPostBalance = resolved.meta.postTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
+        if (signerPostBalance.uiTokenAmount.uiAmount - signerPreBalance.uiTokenAmount.uiAmount >= 1500) {
+          const address = t.memo?.split('] ')[1]?.split(':')[0];
+          const mint = t?.memo?.split('] ')[1]?.split(':')[1];
+          if (!cache[address]) {
+            cache[address] = [];
+          }
+          console.log( t.memo)
+          cache[address].push(mint);
+          cache[address] = [...new Set(cache[address])];
+        }
+      }
+    }
+    const vals = [...txs.values()];
+    console.log(...vals)
+    const sorted = [...vals].sort((a, b) => b.blockTime - a.blockTime);
+    before = sorted[sorted.length - 1]?.signature;
+    await sleep(1000);
+    } catch (e) {
+      console.log(e)
+    }
+    console.log(JSON.stringify(cache));
   }
-  const msg = await getTxRecursively(txid);
-  logToDiscord(msg);
-  res.status(200).send({ success: true });
+})();
+var router = express.Router();
+
+router.get('/', async function (req, res, next) {
+  const { address } = req.query;
+  const mints = cache[address];
+
+  res.status(200).send(mints);
 });
 module.exports = router;

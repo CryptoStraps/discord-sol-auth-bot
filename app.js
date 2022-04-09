@@ -4,11 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
-var submitRouter = require("./routes/submit");
-var authRouter = require("./routes/auth");
 var validateRouter = require("./routes/validate");
-var statusRouter = require("./routes/get-list");
-
 var app = express();
 
 app.use(logger("dev"));
@@ -23,8 +19,8 @@ var allowedOrigins = [
 ];
 
 if (process.env.DEV === 'true') {
-  allowedOrigins.push( "http://localhost:3000")
-  allowedOrigins.push( "http://localhost:3001",)
+  allowedOrigins.push("http://localhost:3000")
+  allowedOrigins.push("http://localhost:3001",)
 }
 
 app.use(
@@ -43,10 +39,7 @@ app.use(
     },
   })
 );
-app.use("/auth", authRouter);
 app.use("/validate", validateRouter);
-app.use("/submit", submitRouter);
-app.use("/status", statusRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -63,7 +56,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.status(500).send("error");
 });
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', function (err) {
   createError(500)
   // Handle the error safely
   console.log(err)
