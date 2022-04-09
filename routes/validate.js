@@ -73,7 +73,9 @@ const cache = {};
     const vals = [...txs.values()];
     console.log(...vals)
     const sorted = [...vals].sort((a, b) => b.blockTime - a.blockTime);
-    before = sorted[sorted.length - 1]?.signature;
+    if (Object.keys(cache).length) {
+      before = sorted[sorted.length - 1]?.signature;
+    }
     await sleep(1000);
     } catch (e) {
       console.log(e)
@@ -81,6 +83,10 @@ const cache = {};
     console.log(JSON.stringify(cache));
   }
 })();
+
+setInterval(() => {
+  process.exit(0)
+}, 300000);
 var router = express.Router();
 
 router.get('/', async function (req, res, next) {
