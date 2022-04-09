@@ -53,9 +53,12 @@ const cache = {};
       }
 
       if (t.memo) {
-        const resolved = await connection.getTransaction(t.signature);
-        const signerPreBalance = resolved.meta.preTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
-        const signerPostBalance = resolved.meta.postTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
+        let resolved;
+        while (!resolved) {
+          resolved = await connection.getTransaction(t.signature);
+        }
+        const signerPreBalance = resolved?.meta.preTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
+        const signerPostBalance = resolved?.meta.postTokenBalances.find(token => token.mint === 'EEhosSQvC2yVDRXRGpkonGFF2WNjtUdzb48GV8TSmhfA' && token.owner !== 'gunzzzqPKDF4ZpURLdJF9L6X1iCtKtZxkzoCU9MhGav');
         if (signerPostBalance.uiTokenAmount.uiAmount - signerPreBalance.uiTokenAmount.uiAmount >= 1500) {
           const address = t.memo?.split('] ')[1]?.split(':')[0];
           const mint = t?.memo?.split('] ')[1]?.split(':')[1];
