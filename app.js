@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 var cors = require("cors");
 app.use(cookieParser());
 var allowedOrigins = [
-  "https://whitelist.cryptostraps.io",
+  "https://swap-ammo.vercel.app/",
 ];
 
 if (process.env.DEV === 'true') {
